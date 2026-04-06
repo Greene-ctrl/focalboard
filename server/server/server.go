@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"os"
 	"runtime"
-	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -154,23 +153,6 @@ func New(params Params) (*Server, error) {
 	if _, err := app.GetRootTeam(); err != nil {
 		params.Logger.Error("Unable to get root team", mlog.Err(err))
 		return nil, err
-	}
-
-	// Read admin password from environment and create/update admin user if present
-	if adminPass := os.Getenv("your_secure_password"); adminPass != "" {
-		params.Logger.Info("your_secure_password environment variable found. Checking/Creating admin user.")
-		if err := app.RegisterUser("admin", "admin@localhost", adminPass); err != nil {
-			if strings.Contains(err.Error(), "already exists") {
-				params.Logger.Info("Admin user already exists, updating password.")
-				if updateErr := app.UpdateUserPassword("admin", adminPass); updateErr != nil {
-					params.Logger.Error("Failed to update admin password", mlog.Err(updateErr))
-				}
-			} else {
-				params.Logger.Error("Failed to create admin user", mlog.Err(err))
-			}
-		} else {
-			params.Logger.Info("Admin user created successfully.")
-		}
 	}
 
 	webServer := web.NewServer(params.Cfg.WebPath, params.Cfg.ServerRoot, params.Cfg.Port,

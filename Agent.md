@@ -17,7 +17,6 @@ Choose the correct SDK based on the app type based on the codebase language:
 - The environment variable **`HF_TOKEN` will always be provided at execution time**.
 - Never hardcode the token. Always read it from the environment.
 - All monitoring and log‑streaming commands rely on `$HF_TOKEN`.
-- **`your_secure_password`**: This environment variable controls the default admin user password. The application intercepts this variable on startup and will automatically create or update the system user `admin` to authenticate with the password stored in this variable.
 
 ### Required Files
 - `Dockerfile` (or `app.py` for Gradio/Streamlit SDKs)

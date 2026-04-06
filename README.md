@@ -1,3 +1,9 @@
+---
+title: Kanban
+sdk: docker
+app_port: 7860
+---
+
 > [!WARNING]
 > This repository is currently not maintained. If you're interested in becoming a maintainer please [let us know here](https://github.com/mattermost-community/focalboard/issues/5038).
 >

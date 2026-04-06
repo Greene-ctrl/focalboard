@@ -61,6 +61,10 @@ func NewAPI(
 	}
 }
 
+func (a *API) handleHealthCheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusOK)
+}
+
 func (a *API) RegisterRoutes(r *mux.Router) {
 	apiv2 := r.PathPrefix("/api/v2").Subrouter()
 	apiv2.Use(a.panicHandler)
@@ -82,6 +86,10 @@ func (a *API) RegisterRoutes(r *mux.Router) {
 	a.registerAchivesRoutes(apiv2)
 	a.registerSubscriptionsRoutes(apiv2)
 	a.registerFilesRoutes(apiv2)
+
+	r.HandleFunc("/health", a.handleHealthCheck).Methods("GET")
+	r.PathPrefix("/api-docs").Handler(http.StripPrefix("/api-docs", http.FileServer(http.Dir("./server/swagger/docs/html/"))))
+
 	a.registerOnboardingRoutes(apiv2)
 	a.registerSearchRoutes(apiv2)
 	a.registerConfigRoutes(apiv2)

@@ -10,14 +10,14 @@ RUN CPPFLAGS="-DPNG_ARM_NEON_OPT=0" npm install --no-optional && \
     npm run pack
 
 ### Go build
-FROM golang:1.18.3@sha256:b203dc573d81da7b3176264bfa447bd7c10c9347689be40540381838d75eebef AS gobuild
+FROM golang:1.21.8 AS gobuild
 
 WORKDIR /go/src/focalboard
 ADD . /go/src/focalboard
 
-# Get target architecture 
+# Get target architecture
 ARG TARGETOS
-ARG TARGETARCH  
+ARG TARGETARCH
 
 RUN EXCLUDE_PLUGIN=true EXCLUDE_SERVER=true EXCLUDE_ENTERPRISE=true make server-docker os=${TARGETOS} arch=${TARGETARCH}
 
@@ -37,9 +37,9 @@ COPY --from=gobuild --chown=nobody:nogroup /go/src/focalboard/server/swagger/doc
 
 USER nobody
 
-EXPOSE 8000/tcp
+EXPOSE 7860/tcp
 
-EXPOSE 8000/tcp 9092/tcp
+EXPOSE 7860/tcp 9092/tcp
 
 VOLUME /opt/focalboard/data
 

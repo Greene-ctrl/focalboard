@@ -103,35 +103,35 @@ Every REST API request directed to `https://Leon4gr45-kanban.hf.space/api/v2/*` 
 If this header is omitted, the API will forcefully reject the request with `400 Bad Request: checkCSRFToken FAILED`.
 
 ### Authentication & Session Management
-Most API operations (such as listing boards or users) are protected and require a valid user session. The server tracks sessions using the `focalboard_session` cookie.
+Most API operations (such as listing boards or users) are protected and require a valid user session.
 
 #### 1. Authenticate (Login)
-To initiate a session, submit your username and password to the `/api/v2/login` endpoint and save the response cookies to a file.
+To initiate a session, submit your username and password to the `/api/v2/login` endpoint. **Crucially, the payload must include `"type": "normal"`** alongside the credentials.
 
 ```bash
 curl -X POST "https://Leon4gr45-kanban.hf.space/api/v2/login" \
   -H "X-Requested-With: XMLHttpRequest" \
   -H "Content-Type: application/json" \
-  -d '{"username": "admin", "password": "your_secure_password"}' \
-  -c cookies.txt
+  -d '{"type": "normal", "username": "admin", "password": "your_secure_password"}'
 ```
+This will return a JSON response containing your session token, such as `{"token":"...long_token_string..."}`.
 *(Note: If no users exist yet, you may need to register first using the `/api/v2/register` endpoint).*
 
 #### 2. Execute Authenticated API Calls
-Subsequent requests should read the `focalboard_session` cookie from the file you saved in Step 1 using `-b cookies.txt`.
+Subsequent requests should include this token in the `Authorization: Bearer <TOKEN>` header.
 
 **Example: Get Current User Data**
 ```bash
 curl -X GET "https://Leon4gr45-kanban.hf.space/api/v2/users/me" \
   -H "X-Requested-With: XMLHttpRequest" \
-  -b cookies.txt
+  -H "Authorization: Bearer <your_token_here>"
 ```
 
 **Example: List Workspace Boards**
 ```bash
 curl -X GET "https://Leon4gr45-kanban.hf.space/api/v2/teams/0/boards" \
   -H "X-Requested-With: XMLHttpRequest" \
-  -b cookies.txt
+  -H "Authorization: Bearer <your_token_here>"
 ```
 
 By adhering to these rules, subsequent agents or users can robustly navigate and manage the Kanban via the API.

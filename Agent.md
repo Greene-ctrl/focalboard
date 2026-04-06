@@ -88,3 +88,50 @@ curl -N
 "https://huggingface.co/api/spaces/Leon4gr45/kanban/logs/run"
 
 after 300 seconds to see if the deployment has been successful, and if not, fix the errors of deployment, and redeploy and monitor in a cycle until the space is running and reacts to the api endpoints you created.
+
+---
+
+## 4. API Authentication and Usage via curl
+
+Focalboard's API endpoints require explicit Anti-CSRF protection and session authentication. Use the following guidelines to communicate with the REST API using `curl`.
+
+### Mandatory Header (CSRF Protection)
+Every REST API request directed to `https://Leon4gr45-kanban.hf.space/api/v2/*` **must** include the following header:
+```bash
+-H "X-Requested-With: XMLHttpRequest"
+```
+If this header is omitted, the API will forcefully reject the request with `400 Bad Request: checkCSRFToken FAILED`.
+
+### Authentication & Session Management
+Most API operations (such as listing boards or users) are protected and require a valid user session. The server tracks sessions using the `focalboard_session` cookie.
+
+#### 1. Authenticate (Login)
+To initiate a session, submit your username and password to the `/api/v2/login` endpoint and save the response cookies to a file.
+
+```bash
+curl -X POST "https://Leon4gr45-kanban.hf.space/api/v2/login" \
+  -H "X-Requested-With: XMLHttpRequest" \
+  -H "Content-Type: application/json" \
+  -d '{"username": "admin", "password": "your_secure_password"}' \
+  -c cookies.txt
+```
+*(Note: If no users exist yet, you may need to register first using the `/api/v2/register` endpoint).*
+
+#### 2. Execute Authenticated API Calls
+Subsequent requests should read the `focalboard_session` cookie from the file you saved in Step 1 using `-b cookies.txt`.
+
+**Example: Get Current User Data**
+```bash
+curl -X GET "https://Leon4gr45-kanban.hf.space/api/v2/users/me" \
+  -H "X-Requested-With: XMLHttpRequest" \
+  -b cookies.txt
+```
+
+**Example: List Workspace Boards**
+```bash
+curl -X GET "https://Leon4gr45-kanban.hf.space/api/v2/teams/0/boards" \
+  -H "X-Requested-With: XMLHttpRequest" \
+  -b cookies.txt
+```
+
+By adhering to these rules, subsequent agents or users can robustly navigate and manage the Kanban via the API.
